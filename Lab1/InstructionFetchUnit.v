@@ -37,15 +37,18 @@
 // which generates a continuous clock pulse into the module.
 ////////////////////////////////////////////////////////////////////////////////
 
-module InstructionFetchUnit(Instruction, Reset, Clk);
+module InstructionFetchUnit(Instruction, Reset, Clk, debug_PCResult);
 
     input Reset;
     input Clk;
 
     output [31:0] Instruction;
+    output [31:0] debug_PCResult;
     
-    wire [31:0] PCResult;
+   (* mark_debug = "true" *) wire [31:0] PCResult;
     wire [31:0] PCAddResult;
+    
+    assign debug_PCResult = PCResult;
 
     ProgramCounter pc(
         .Address(PCAddResult),
