@@ -40,8 +40,6 @@ module InstructionMemory_tb();
 	   #10;
 	   
 	   $finish;
-	   
-    /* Please fill in the implementation here... */
 	
 	end
 

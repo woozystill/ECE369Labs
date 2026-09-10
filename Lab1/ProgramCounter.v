@@ -37,7 +37,6 @@ module ProgramCounter(Address, PCResult, Reset, Clk);
         else 
             PCResult <= Address;
     end
-    /* Please fill in the implementation here... */
 
 endmodule
 

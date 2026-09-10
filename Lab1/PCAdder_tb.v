@@ -34,8 +34,6 @@ module PCAdder_tb();
         
 	    $finish;
 	
-    /* Please fill in the implementation here... */
-	
 	end
 
 endmodule

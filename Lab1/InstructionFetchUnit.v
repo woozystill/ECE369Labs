@@ -1,9 +1,11 @@
 `timescale 1ns / 1ps
 
 ////////////////////////////////////////////////////////////////////////////////
-// Team Members:
-// Overall percent effort of each team meber: 
-// 
+// Team Members: Zach Scheve, Trevor Fife, Huda Madi
+// Overall percent effort of each team member: 
+// Zach Scheve - 40%
+// Trevor Fife - 40%
+// Huda Madi - 20%
 // ECE369A - Computer Architecture
 // Laboratory 3 (PostLab)
 // Module - InstructionFetchUnit.v
@@ -45,6 +47,7 @@ module InstructionFetchUnit(Instruction, Reset, Clk, debug_PCResult);
     output [31:0] Instruction;
     output [31:0] debug_PCResult;
     
+    // Retain PCResult so the internal PC can be observed during post-routing functional simulation
    (* mark_debug = "true" *) wire [31:0] PCResult;
     wire [31:0] PCAddResult;
     
@@ -66,8 +69,6 @@ module InstructionFetchUnit(Instruction, Reset, Clk, debug_PCResult);
 	.Address(PCResult),
 	.Instruction(Instruction)
     );
-
-    /* Please fill in the implementation here... */
 
 endmodule
 

@@ -47,7 +47,6 @@ module ProgramCounter_tb();
 	   
 	   #20;
 	   $finish;
-    /* Please fill in the implementation here... */
 	
 	end
 
