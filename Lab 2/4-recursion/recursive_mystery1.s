@@ -1,5 +1,7 @@
 # Exercise 3
 # Max Score: 12 points
+# Students:
+# Trevor Fife - 100%
 .data	
 list1:		.word		3, 9, 1, 2, 6, 3, -4, -7, -8, 4, -2,  8, 7, 6
 .text 		# list1 is an array of integers storing the given sequence of values	 
