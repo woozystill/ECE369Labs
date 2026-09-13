@@ -40,4 +40,4 @@ li	$v0, 0			# Return value
 	jr 	$ra			# Return
 # Step through this code in your simulator and monitor the register values. 
 # What does the tomato function do?   
-# Write your answer HERE_ _ _ _ _ _ _ _ _ #                
+# Write your answer HERE_ It recursively sums the first $a0 elements of the array and returns the sum in $v0_ #

@@ -48,12 +48,12 @@ main:	addi	$sp, $sp, -4	# Make space on stack
 	li	$a0, 8
       li    $a2, 5		
 	jal	test		
-# What is the value of $v0 at this point? (v0)= _ _ _ _ _ _ _ _        #
+# What is the value of $v0 at this point? (v0)= _ 25_ _ _ _ _ _ _        #
 	la	$a1, list1	
 	li	$a0, 13		
 	jal	test		
-# What is the value of $v0 at this point?	(v0) = _ _ _ _ _ _ _ _       #
-# What does this code compute? Your answer HERE: _ _ _ _ _ _ _ _ _ _ _ _ #
+# What is the value of $v0 at this point?	(v0) = _ _ _34 _ _ _ _ _       #
+# What does this code compute? Your answer HERE: _ It recursively sums the first $a0 elements whose values are greater than or equal to $a2 and returns the sum in $v0 _ #
 
 return:	
 li	$v0, 0		# Return value
