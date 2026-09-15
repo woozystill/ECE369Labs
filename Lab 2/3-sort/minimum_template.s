@@ -38,6 +38,7 @@
 # This algorithm first finds the largest element in A[0]..A[n] and moves it to 
 # position n, then finds the largest element in A[0]..A[n-1] and puts that in position n-1, 
 # and so forth.
+
 # -Use  MIPS function MaxIndex from Task 1, which takes two arguments A and n, and returns 
 # the index of the largest element of A[0]..A[n]. The arguments and return values are passed 
 # in registers $a0, $a1 and $v0 respectively.
@@ -104,7 +105,25 @@ done:
 MaxIndex:   
     # Please fill in your implementation for 'MaxIndex' below this line !##########################
     # Your code begins
+maxmium:
+    lw      $t0, 0($a0)     # min=V[0]
+    addi    $t1,$0, 1       # i=1
+    add     $t3,$0, 0       # $t3=0
 
+loop:
+    bge     $t1,$a1,done    # i>=n ?
+    mul     $t2, $t1, 4     # $t2 = $t1 * 4
+    add     $t2,$t2,$a0
+    lw      $t2, 0($t2)     # $t2 = V[i]
+    ble     $t2,$t0,next    # V[i] >= min ?
+    add     $t0,$t2,$0      # max=V[i]
+    add     $t3,$t1,$0      # max_index=max
+next:
+    addi    $t1,$t1,1       # i++
+    j       loop            # Loop back
+done: 
+    add     $v0,$t3,$0      # return max
+    jr      $ra
     # Your code ends
 
     
@@ -140,17 +159,17 @@ sloop:
     
     # You will need 10-15 lines of code!
     # Your code begins
-            # [$t0=MaxIndex] MaxIndex ($v0), that needs to be swapped with index n - 1
-            # [$t0=4*$t0] Calculate the offset for MaxIndex
-            # [$t0=$t0+$a0] Calculate the address for V[MaxIndex]
-            # [$t2=V[$t0]] Load the value of memory address $t0 to $t2, $t2 = V[MaxIndex]
-            # [$t1=$s0-1] The index (n - 1) that will be swapped with MaxIndex
-            # [$t1=4*$t1] Calculate offset for index n - 1
-            # [$t1=$t1+$a0] Calculate the address for V[n - 1]
-            # [$t3=V[$t1]] Load the value of memory address $t1 to $t3, $t3 = V[n - 1]
-            # [V[$t1]=$t2] Store V[n-1] to be V[MaxIndex]
-            # [V[$t0]=$t3] Store V[MaxIndex] to be the original V[n - 1]
-            # [$s0=$s0-1] Len = Len - 1    
+    move    $t0,$v0             # [$t0=MaxIndex] MaxIndex ($v0), that needs to be swapped with index n - 1
+    mul     $t0,$t0,4           # [$t0=4*$t0] Calculate the offset for MaxIndex
+    add     $t0,$t0,$a0         # [$t0=$t0+$a0] Calculate the address for V[MaxIndex]
+    lw      $t2,0($t0)          # [$t2=V[$t0]] Load the value of memory address $t0 to $t2, $t2 = V[MaxIndex]
+    sub     $t1,$s0,1           # [$t1=$s0-1] The index (n - 1) that will be swapped with MaxIndex
+    mul     $t1,$t1,4           # [$t1=4*$t1] Calculate offset for index n - 1
+    add     $t1,$t1,$a0         # [$t1=$t1+$a0] Calculate the address for V[n - 1]
+    lw      $t3,0($t1)          # [$t3=V[$t1]] Load the value of memory address $t1 to $t3, $t3 = V[n - 1]
+    sw      $t2,0($t1)          # [V[$t1]=$t2] Store V[n-1] to be V[MaxIndex]
+    sw      $t3,0($t0)          # [V[$t0]=$t3] Store V[MaxIndex] to be the original V[n - 1]
+    sub     $s0,$s0,1           # [$s0=$s0-1] Len = Len - 1    
     # Your code ends
     j       sloop           # Jump back to sort loop
 
