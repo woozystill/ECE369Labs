@@ -2,7 +2,7 @@
 # 'sum_of_array.s' - This program performs the sum of the array
 #  Max Score: 5 points
 #
-# Students: 
+# Students: Zach Scheve - 100%
 #
 #
 # Insert your answers below each question:-

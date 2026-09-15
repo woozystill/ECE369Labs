@@ -1,7 +1,8 @@
 # Exercise 3
 # Max Score: 12 points
 #
-# Students: 
+# Students: Zach Scheve - 50%
+# Huda Madi - 50%
 #
 # minimum.s 
 # Finds the index of the smallest element in an integer array
