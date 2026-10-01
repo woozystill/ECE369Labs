@@ -1,5 +1,5 @@
 #  Fall 2024
-#  Team Members: Trevor Fife, Zach Scheve, 
+#  Team Members: Trevor Fife, Zach Scheve, Huda
 #  % Effort    :   
 #
 # ECE369A,  
@@ -501,7 +501,7 @@ main:
    
     jal     vbsme           # call function
     jal     print_result    # print results to console
-
+    
     ############################################################
     # End of test 1   
 
@@ -775,9 +775,210 @@ print_result:
 
 
 # Begin subroutine
-vbsme:  
-    li      $v0, 0              # reset $v0 and $V1
-    li      $v1, 0
+li      $v0, 0              # reset $v0 and $V1
+li      $v1, 0   
+    # insert your code here
+
+# TASK 3: search
+# This moves the frame in a circular pattern, calls convert_position for each candidate and computes the SAD. Then keeps the minimum.
+
+vbsme:                                       
+    addi   $sp, $sp, -36                    # allocate stack space, and save registers on stack, found if we dont have this, we get garbage addresses
+    sw      $ra, 32($sp)
+    sw      $s0, 28($sp)
+    sw      $s1, 24($sp)
+    sw      $s2, 20($sp)
+    sw      $s3, 16($sp)
+    sw      $s4, 12($sp)
+    sw      $s5, 8($sp)
+    sw      $s6, 4($sp)
+    sw      $s7, 0($sp)
+
+
+    lw      $s1, 4($a0)                     # frame columns
+    lw      $s2, 8($a0)                     # window rows
+    lw      $s3, 12($a0)                    # window columns
+    lw      $t0, 0($a0)                     # frame rows
+
+    sub    $s5, $t0, $s2                    # bottom = frame rows - window rows
+    sub    $s7, $s1, $s3                    # right  = frame cols - window cols
+    move    $s4, $zero                      # top = 0
+    move    $s6, $zero                      # left = 0
+
+    li      $s0, 0x7fffffff                 # init the minimum SAD with the largest number since its going to get smaller, f will not work as the first char since it will amke it signed
+    move    $v0, $zero                      # init best row
+    move    $v1, $zero                      # init best column
+
+search_check:                               # every new loop as the program moves inward this stops when top and bottom or left and right cross
+    slt     $t0, $s5, $s4                   # check if bottom < top?
+    bne     $t0, $zero, done                # if yes go to done
+    slt     $t0, $s7, $s6                   # check if right < left?
+    bne     $t0, $zero, done                # if yes go to done
+    move    $t8, $s4                        # current row
+    move    $t9, $s6                        # current column
+    
+search_top:                                 #moves from top left edge to the righ
+    slt     $t0, $s7, $t9                   # is the right < current column?
+    bne     $t0, $zero, search_top_done     # if yes, go to search_top_done
+    jal     convert_position                # get SAD calc of sampled area into $t7
+    slt     $t0, $t7, $s0                   # set t0 to 1 if new SAD calc < smallest SAD so far
+    beq     $t0, $zero, search_top_next     # if its not a new min, go to top_next and check the next area
+    move    $s0, $t7                        # else store new minimum SAD
+    move    $v0, $t8                        # store new best row
+    move    $v1, $t9                        # store new best column
+
+search_top_next:                            # check next column on the top edge
+    addi   $t9, $t9, 1                      # column+1
+    j       search_top                      # go back to search_top to check if its a new best SAD
+
+search_top_done:                            # when top edge search is finished
+    addi   $s4, $s4, 1                      # top+1
+    move    $t8, $s4                        # set current row to top of next search
+    move    $t9, $s7                        # set current column to right of next search
+
+search_right:                               # this loop moves along the right edge from the top to bottom
+    slt     $t0, $s5, $t8                   # set t0 = 1 if bottom < current row
+    bne     $t0, $zero, search_right_done   # if true go to search_right_done
+    jal     convert_position                # get SAD of new area from convert_position
+    sltu    $t0, $t7, $s0                   # if new SAD < minimum SAD so far, t0 = 1
+    beq     $t0, $zero, search_right_next   # else go to search_right_next
+    move    $s0, $t7                        # if a new min is found set value and coordinates
+    move    $v0, $t8
+    move    $v1, $t9
+
+search_right_next:                          # look at next row on the right edge
+    addi   $t8, $t8, 1                      # move to next row
+    j       search_right                    # jump back to search_right
+
+search_right_done:                          # for when right edge finished
+    addi   $s7, $s7, -1                     # right-1
+    slt     $t0, $s5, $s4                   # set $t0 = 1 if bottom < top
+    bne     $t0, $zero, search_skip_bottom  # if bottom < top go to to search_skip_bottom
+    move    $t8, $s5                        # else set current row = bottom
+    move    $t9, $s7                        # current column = right
+
+search_bottom:                              # this loop moves along the bottom edge right to left
+    slt     $t0, $t9, $s6                   # if current column < left set t0 = 1
+    bne     $t0, $zero, search_bottom_done  # if the test above is true, branch to search_bottom_done
+    jal     convert_position                # get SAD of new area from convert_position which puts it in t7
+    sltu    $t0, $t7, $s0                   # if new SAD < minimum SAD set t0 = 1
+    beq     $t0, $zero, search_bottom_next  # else go to search_bottom_next
+    move    $s0, $t7                        # new minimum SAD if found
+    move    $v0, $t8
+    move    $v1, $t9
+
+search_bottom_next:                         # look at the prev column on the bottom edge
+    addi   $t9, $t9, -1                     # column-1
+    j       search_bottom                   # jump back to search_bottom to get SAD in the new area
+
+search_bottom_done:                         # will go here if the bottom edge is finished
+    addi   $s5, $s5, -1                     # bottom-1
+
+search_skip_bottom:                         # this goes to the next target when there is no bottom edge left, looks at left edge from bottom to top if there is one
+    slt     $t0, $s7, $s6                   # right < left t0 = 1
+    bne     $t0, $zero, search_skip_left    # if true go to search_skip_left
+    move    $t8, $s5                        # current row = bottom
+    move    $t9, $s6                        # current column = left
+
+search_left:                                # this loop looks at the left edge bottom to top
+    slt     $t0, $t8, $s4                   # if current row < top t0 = 1
+    bne     $t0, $zero, search_left_done    # if truego to search_left_done
+    jal     convert_position                # else get SAD of area into t7
+    sltu    $t0, $t7, $s0                   # if new SAD < minimum SAD so far t0 = 1 
+    beq     $t0, $zero, search_left_next    # else keep searching
+    move    $s0, $t7                        # if new minimum SAD, store value and coordinates
+    move    $v0, $t8
+    move    $v1, $t9
+
+search_left_next:                           # go to prev row on left edge
+    addi   $t8, $t8, -1                     # row-1
+    j       search_left                     # jump back to search_left to search new area
+
+search_left_done:                           # if the left edge finished
+    addi   $s6, $s6, 1                      # then left+1
+
+search_skip_left:                           # come here when no left edge
+    j       search_check                    # then start at beginning with search_check
+
+done:                                       # restore registers from stack
+    lw      $s7, 0($sp)
+    lw      $s6, 4($sp)
+    lw      $s5, 8($sp)
+    lw      $s4, 12($sp)
+    lw      $s3, 16($sp)
+    lw      $s2, 20($sp)
+    lw      $s1, 24($sp)
+    lw      $s0, 28($sp)
+    lw      $ra, 32($sp)
+    addi   $sp, $sp, 36
+    jr      $ra
+
+
+# TASK 2: address generation for the current position
+# convert_position turns (row $t8, column $t9) into the address of the candidate
+# block in the frame (no mult/div), then calls Task 1 to get its SAD.
+# Inputs
+#           $t8 = possible row
+#           $t9 = possible column
+# Output 
+#           $t7 = SAD calc
+# Other registers
+#           $a1 = frame base
+#           $a2 = window base
+#           $s1 = frame columns
+#           $s2 = window rows
+#           $s3 = window columns
+
+convert_position:                           # get address
+    move    $t0, $zero                      # row * frame columns
+    move    $t1, $zero                      # counter
+sad_row_offset:                             # this loop add one frame row of elements per row index
+    beq     $t1, $t8, sad_row_offset_done   # did counter reached candidate row?
+    add    $t0, $t0, $s1                    # add one frame row of elements
+    addi   $t1, $t1, 1                      # counter+1
+    j       sad_row_offset                  # jump back to sad_row_offset
+sad_row_offset_done:                        # row offset (row * frame columns) computed
+    add    $t0, $t0, $t9                    # index
+    sll     $t0, $t0, 2                     # byte offset
+    add    $t0, $a1, $t0                    # frame row pointer
+
+   
+    # Merging the tasks: This was made since all tasks were created seperatly by each group memeber
+    # This had to be added since task 1 uses $s0, $s4, $s5, $t8, $t9, $v0, $v1, and $a1
+    # This section stores the registers on the stack and then restors them once the SAD calc is done
+
+    addi   $sp, $sp, -36                    # allocate stack space
+    sw      $ra, 32($sp)                    # the next few lines saves the resisters so task 1 can use em
+    sw      $a1, 28($sp)
+    sw      $s0, 24($sp)
+    sw      $s4, 20($sp)
+    sw      $s5, 16($sp)
+    sw      $v0, 12($sp)
+    sw      $v1, 8($sp)
+    sw      $t8, 4($sp)
+    sw      $t9, 0($sp)
+
+    move    $a1, $t0                        # address of candidate block in frame from SAD calc in Task 1
+    jal     task1_sad                       # gives the address of the next instruction to $ra, otherwise, it wouldnt be able to go to the SAD calc
+  
+    move    $t7, $s5                        # Task 3 looks for the SAD in $t7
+
+    lw      $t9, 0($sp)                     # restores registers from the stack
+    lw      $t8, 4($sp)
+    lw      $v1, 8($sp)
+    lw      $v0, 12($sp)
+    lw      $s5, 16($sp)
+    lw      $s4, 20($sp)
+    lw      $s0, 24($sp)
+    lw      $a1, 28($sp)
+    lw      $ra, 32($sp)
+    addi   $sp, $sp, 36
+    jr      $ra
+
+
+
+task1_sad:
+               
 
     # insert your code here
     # Task 1:
@@ -806,11 +1007,11 @@ vbsme:
     li      $t0, 0           # SAD total
     li      $t1, 0           # window row index
 
-    sad_row_loop:
+    sad_row_loop:                            # loop over window rows
         beq     $t1, $s2, sad_done   # if row == window rows, SAD is complete
         li      $t2, 0               # reset window column index
 
-    sad_col_loop:
+    sad_col_loop:                            # loop over window columns
         beq     $t2, $s3, sad_next_row   # finished all columns in this row
         mul     $t3, $t1, $s3       # row * window columns
         add     $t3, $t3, $t2       # + column
@@ -826,15 +1027,15 @@ vbsme:
         bgez    $t9, sad_add         # if difference >= 0, keep it
         sub     $t9, $zero, $t9      # otherwise make it positive
 
-    sad_add:
+    sad_add:                                 # accumulate the absolute difference
         add     $t0, $t0, $t9       # SAD += absolute difference
         addi    $t2, $t2, 1         # move to next window column
-        j       sad_col_loop
+        j       sad_col_loop                 # jump back to sad_col_loop
 
-    sad_next_row:
+    sad_next_row:                            # finished a row, go to the next one
         addi    $t1, $t1, 1         # move to next window row
-        j       sad_row_loop
+        j       sad_row_loop                 # jump back to sad_row_loop
 
-    sad_done:
+    sad_done:                                # SAD complete
     move    $s5, $t0            # store final SAD for current candidate
     jr      $ra                 # return to caller
