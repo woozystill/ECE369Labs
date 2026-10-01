@@ -796,11 +796,11 @@ vbsme:
     sw      $s6, 4($sp)
     sw      $s7, 0($sp)
 
-
+    lw      $t0, 0($a0)                     # frame rows
     lw      $s1, 4($a0)                     # frame columns
     lw      $s2, 8($a0)                     # window rows
     lw      $s3, 12($a0)                    # window columns
-    lw      $t0, 0($a0)                     # frame rows
+
 
     sub    $s5, $t0, $s2                    # bottom = frame rows - window rows
     sub    $s7, $s1, $s3                    # right  = frame cols - window cols
@@ -812,15 +812,15 @@ vbsme:
     move    $v1, $zero                      # init best column
 
 search_check:                               # every new loop as the program moves inward this stops when top and bottom or left and right cross
-    slt     $t0, $s5, $s4                   # check if bottom < top?
+    slt     $t0, $s5, $s4                   # check if bottom < top
     bne     $t0, $zero, done                # if yes go to done
-    slt     $t0, $s7, $s6                   # check if right < left?
+    slt     $t0, $s7, $s6                   # check if right < left
     bne     $t0, $zero, done                # if yes go to done
     move    $t8, $s4                        # current row
     move    $t9, $s6                        # current column
     
-search_top:                                 #moves from top left edge to the righ
-    slt     $t0, $s7, $t9                   # is the right < current column?
+search_top:                                 #moves from top left edge to the right
+    slt     $t0, $s7, $t9                   # is the right < current column
     bne     $t0, $zero, search_top_done     # if yes, go to search_top_done
     jal     convert_position                # get SAD calc of sampled area into $t7
     slt     $t0, $t7, $s0                   # set t0 to 1 if new SAD calc < smallest SAD so far
@@ -917,8 +917,7 @@ done:                                       # restore registers from stack
 
 
 # TASK 2: address generation for the current position
-# convert_position turns (row $t8, column $t9) into the address of the candidate
-# block in the frame (no mult/div), then calls Task 1 to get its SAD.
+# convert_position turns (row $t8, column $t9) into the address of the possible new SAD area then calls Task 1 to get its SAD.
 # Inputs
 #           $t8 = possible row
 #           $t9 = possible column
@@ -934,14 +933,16 @@ done:                                       # restore registers from stack
 convert_position:                           # get address
     move    $t0, $zero                      # row * frame columns
     move    $t1, $zero                      # counter
-sad_row_offset:                             # this loop add one frame row of elements per row index
-    beq     $t1, $t8, sad_row_offset_done   # did counter reached candidate row?
+
+sad_row_offset:                             # this loop adds one frame row of elements per row index
+    beq    $t1, $t8, sad_row_offset_done    # check if counter reached possible area row
     add    $t0, $t0, $s1                    # add one frame row of elements
     addi   $t1, $t1, 1                      # counter+1
-    j       sad_row_offset                  # jump back to sad_row_offset
-sad_row_offset_done:                        # row offset (row * frame columns) computed
+    j      sad_row_offset                   # jump back to sad_row_offset
+
+sad_row_offset_done:                        # row offset
     add    $t0, $t0, $t9                    # index
-    sll     $t0, $t0, 2                     # byte offset
+    sll    $t0, $t0, 2                      # byte offset
     add    $t0, $a1, $t0                    # frame row pointer
 
    
@@ -949,7 +950,7 @@ sad_row_offset_done:                        # row offset (row * frame columns) c
     # This had to be added since task 1 uses $s0, $s4, $s5, $t8, $t9, $v0, $v1, and $a1
     # This section stores the registers on the stack and then restors them once the SAD calc is done
 
-    addi   $sp, $sp, -36                    # allocate stack space
+    addi    $sp, $sp, -36                   # allocate stack space
     sw      $ra, 32($sp)                    # the next few lines saves the resisters so task 1 can use em
     sw      $a1, 28($sp)
     sw      $s0, 24($sp)
