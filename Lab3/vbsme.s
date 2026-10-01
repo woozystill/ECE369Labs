@@ -1,9 +1,11 @@
 #  Fall 2024
 #  Team Members: Trevor Fife, Zach Scheve, Huda
-#  % Effort    :   
-#
-# ECE369A,  
-# 
+#  % Effort:
+#  Trevor Fife : 33.3%
+#  Zach Scheve : 33.3%
+#  Huda Mustafa Madi : 33.34%
+# ECE369A,  group 9
+
 
 ########################################################################################################################
 ### data
