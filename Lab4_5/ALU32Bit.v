@@ -1,16 +1,12 @@
 `timescale 1ns / 1ps
 
 
-// ALUControl codes:
-//   0000 AND    0001 OR     0010 ADD    0011 SUB    0100 SLT    0101 NOR
-//   0110 XOR    0111 SLL    1000 SRL    1001 MUL    1010 PASS (result = A)
-
 module ALU32Bit(
     input      [3:0]  ALUControl,   // operation select
-    input      [31:0] A,            // first operand (rs value, or shamt for shifts)
-    input      [31:0] B,            // second operand (rt value or sign/zero-extended immediate)
-    output     [31:0] ALUResult,    // result of the operation
-    output            Zero          // high when ALUResult == 0
+    input      [31:0] A,            // first input
+    input      [31:0] B,            // second input
+    output     [31:0] ALUResult,    
+    output            Zero          
 );
     reg [31:0] Result;
 

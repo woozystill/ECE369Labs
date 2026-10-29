@@ -74,7 +74,7 @@ module Controller_tb;
         check("j", 32'h08000040, -1, -1, 0, -1, -1, 0, 0, 0, -1, -1, 0, 1, 0);
         check("jal", 32'h0c000040, 2, -1, 0, -1, -1, 1, 0, 0, -1, 2, 0, 1, 0);
         check("nop", 32'h00000000, -1, -1, 0, -1, -1, 0, 0, 0, -1, -1, 0, 0, 0);
-        if (errors == 0) $display("PASS: all %0d instructions decoded correctly.", tests);
+        if (errors == 0) $display("PASS");
         else             $display("DONE: %0d errors in %0d tests.", errors, tests);
         $finish;
     end

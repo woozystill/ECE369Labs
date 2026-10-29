@@ -42,7 +42,7 @@ module Controller(
                      ALU_SLL  = 4'b0111,
                      ALU_SRL  = 4'b1000,
                      ALU_MUL  = 4'b1001,
-                     ALU_PASS = 4'b1010;   // output = input A used by compare with zero branches
+                     ALU_PASS = 4'b1010;   // output compare with zero branches
 
     // Branch condition codes
     localparam [2:0] BR_NONE = 3'b000,
@@ -54,7 +54,7 @@ module Controller(
                      BR_BLTZ = 3'b110;
 
     wire [5:0] Opcode = Instruction[31:26];
-    wire [4:0] Rt     = Instruction[20:16];   // distinguishes bgez / bltz
+    wire [4:0] Rt     = Instruction[20:16];   // bgez or bltz
     wire [5:0] Funct  = Instruction[5:0];
 
     always @(*) begin
@@ -73,7 +73,7 @@ module Controller(
         Jump     = 1'b0;
         JumpReg  = 1'b0;
 
-        if (Instruction != 32'd0) begin   // all 0 word is the nop
+        if (Instruction != 32'd0) begin   // all 0 is the nop
             case (Opcode)
                 //R-type (SPECIAL)
                 6'b000000: begin
@@ -99,7 +99,7 @@ module Controller(
                     end
                 end
 
-                //I-type ALU
+                //ALU
                 6'b001000: begin ALUSrc = 1'b1; ExtOp = 1'b1; RegWrite = 1'b1; ALUOp = ALU_ADD; end // addi
                 6'b001100: begin ALUSrc = 1'b1; ExtOp = 1'b0; RegWrite = 1'b1; ALUOp = ALU_AND; end // andi
                 6'b001101: begin ALUSrc = 1'b1; ExtOp = 1'b0; RegWrite = 1'b1; ALUOp = ALU_OR;  end // ori
