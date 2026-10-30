@@ -1,10 +1,19 @@
+// ECE369A - Labs 4 and 5
+// Pipelined Datapath
+//
+// Team Member Contributions:
+// Zach Scheve  - 33%
+// Madi Mustafa - 33%
+// Trevor Fife  - 34%
+
 `timescale 1ns / 1ps
 
 module PipelinedDatapath(
     input wire Clk,
     input wire Reset,
     output wire [31:0] PC,
-    output wire [31:0] Instruction
+    output wire [31:0] Instruction,
+    output wire [31:0] RegisterWriteData
 );
 
     // Instruction Fetch (IF) stage
@@ -357,6 +366,8 @@ module PipelinedDatapath(
 
     // Write Back (WB) stage
     wire [31:0] WB_WriteData;
+
+    assign RegisterWriteData = WB_RegWrite ? WB_WriteData : 32'd0;
 
     // Select memory data for loads, otherwise use ALU result
     assign WB_WriteData = (WB_MemToReg == 2'b01)

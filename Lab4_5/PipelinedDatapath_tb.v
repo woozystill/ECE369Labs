@@ -1,3 +1,10 @@
+// ECE369A - Labs 4 and 5
+// Pipelined Datapath
+//
+// Team Member Contributions:
+// Zach Scheve  - 33%
+// Madi Mustafa - 33%
+// Trevor Fife  - 34%
 
 `timescale 1ns / 1ps
 
@@ -9,13 +16,15 @@ module PipelinedDatapath_tb;
 
     wire [31:0] PC;
     wire [31:0] Instruction;
+    wire [31:0] RegisterWriteData;
 
     // Instantiate the complete pipelined processor
     PipelinedDatapath uut(
         .Clk(Clk),
         .Reset(Reset),
         .PC(PC),
-        .Instruction(Instruction)
+        .Instruction(Instruction),
+        .RegisterWriteData(RegisterWriteData)
     );
 
     // Generate clock with a 10 ns period
@@ -40,8 +49,8 @@ module PipelinedDatapath_tb;
     // Monitor processor execution
     always @(negedge Clk) begin
         if (!Reset) begin
-            $display("Time=%0t PC=%h Instruction=%h",
-                     $time, PC, Instruction);
+            $display("Time=%0t PC=%h Instruction=%h RegisterWriteData=%h",
+                     $time, PC, Instruction, RegisterWriteData);
         end
     end
 
