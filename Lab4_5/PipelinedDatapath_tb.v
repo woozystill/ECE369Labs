@@ -30,7 +30,7 @@ module PipelinedDatapath_tb;
         #20;
         Reset = 0;
 
-        // Run processor for 000 ns
+        // Run processor for 3000 ns
         #3000;
 
         $display("Simulation completed.");
@@ -42,20 +42,6 @@ module PipelinedDatapath_tb;
         if (!Reset) begin
             $display("Time=%0t PC=%h Instruction=%h",
                      $time, PC, Instruction);
-
-            // Display register write-back activity
-            if (uut.WB_RegWrite && uut.WB_DestinationReg != 5'd0) begin
-                $display("  Register Write: R%0d = %h",
-                         uut.WB_DestinationReg,
-                         uut.WB_WriteData);
-            end
-
-            // Display memory write activity
-            if (uut.MEM_MemWrite) begin
-                $display("  Memory Write: Address=%h Data=%h",
-                         uut.MEM_ALUResult,
-                         uut.MEM_WriteData);
-            end
         end
     end
 
