@@ -4,7 +4,7 @@ module DataMemory(
     input  wire        Reset,
     input  wire        MemWrite,
     input  wire        MemRead,
-    input  wire [1:0]  MemSize,       // 00=byte, 01=halfword, 10=word
+    input  wire [1:0]  MemSize,       // 00=word, 01=halfword, 10=byte
     input  wire        LoadUnsigned,  // 1=zero extend, 0=sign extend
     input  wire [31:0] Address,
     input  wire [31:0] WriteData,
@@ -25,7 +25,7 @@ module DataMemory(
             // Keep initialized memory contents on reset.
         end else if (MemWrite) begin
             case (MemSize)
-                2'b00: begin
+                2'b10: begin
                     case (Address[1:0])
                         2'b00: memory[word_index][7:0]   <= WriteData[7:0];
                         2'b01: memory[word_index][15:8]  <= WriteData[7:0];
@@ -48,7 +48,7 @@ module DataMemory(
         ReadData = 32'd0;
         if (MemRead) begin
             case (MemSize)
-                2'b00: begin
+                2'b10: begin
                     case (Address[1:0])
                         2'b00: ReadData = LoadUnsigned ? {24'd0, memory[word_index][7:0]}   : {{24{memory[word_index][7]}},  memory[word_index][7:0]};
                         2'b01: ReadData = LoadUnsigned ? {24'd0, memory[word_index][15:8]}  : {{24{memory[word_index][15]}}, memory[word_index][15:8]};

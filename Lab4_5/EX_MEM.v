@@ -1,13 +1,15 @@
 `timescale 1ns / 1ps
 module EX_MEM(
     input wire Clk, Reset, Enable, Flush,
-    input wire RegWriteIn, MemToRegIn, MemReadIn, MemWriteIn,
+    input wire RegWriteIn, MemReadIn, MemWriteIn,
+    input wire [1:0] MemToRegIn,
     input wire [1:0] MemSizeIn,
     input wire LoadUnsignedIn,
     input wire [31:0] BranchTargetIn, ALUResultIn, WriteDataIn,
     input wire ZeroIn,
     input wire [4:0] DestinationRegIn,
-    output reg RegWriteOut, MemToRegOut, MemReadOut, MemWriteOut,
+    output reg RegWriteOut, MemReadOut, MemWriteOut,
+    output reg [1:0] MemToRegOut,
     output reg [1:0] MemSizeOut,
     output reg LoadUnsignedOut,
     output reg [31:0] BranchTargetOut, ALUResultOut, WriteDataOut,
