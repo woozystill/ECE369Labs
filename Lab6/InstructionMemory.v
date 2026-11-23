@@ -9,7 +9,7 @@ module InstructionMemory(
     initial begin
         for (i = 0; i < 1024; i = i + 1)
             memory[i] = 32'h00000000;
-        $readmemh("instruction_memory.mem", memory);
+        $readmemh("lab6.mem", memory);
     end
 
     // Word-aligned address. Address[11:2] indexes 1024 instructions.

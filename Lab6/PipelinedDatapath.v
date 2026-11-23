@@ -21,6 +21,7 @@ module PipelinedDatapath(
     wire [31:0] PCPlus4;
     wire [31:0] NextPC;
     wire [31:0] FetchedInstruction;
+    wire PCWrite, IF_IDWrite, Stall, Redirect;
 
     // IF/ID pipeline outputs
     wire [31:0] ID_PCPlus4;
@@ -31,7 +32,8 @@ module PipelinedDatapath(
         .Address(NextPC),
         .PCResult(CurrentPC),
         .Reset(Reset),
-        .Clk(Clk)
+        .Clk(Clk),
+        .Enable(PCWrite)
     );
 
     // PC + 4
@@ -50,8 +52,8 @@ module PipelinedDatapath(
     IF_ID IF_ID_Register(
         .Clk(Clk),
         .Reset(Reset),
-        .Enable(1'b1),
-        .Flush(1'b0),
+        .Enable(IF_IDWrite),
+        .Flush(Redirect),
         .PCPlus4In(PCPlus4),
         .InstructionIn(FetchedInstruction),
         .PCPlus4Out(ID_PCPlus4),
@@ -143,7 +145,7 @@ module PipelinedDatapath(
         .Clk(Clk),
         .Reset(Reset),
         .Enable(1'b1),
-        .Flush(1'b0),
+        .Flush(Flush),
 
         .RegWriteIn(ID_RegWrite),
         .MemReadIn(ID_MemRead),
@@ -363,6 +365,21 @@ module PipelinedDatapath(
         ID_Jump ? ID_JumpTarget :
         ID_BranchTaken ? ID_BranchTarget :
         PCPlus4;
+
+// flush the wrongly fetched instruction after a taken branch or jump
+// stalled branch is still reading stale registers
+assign Redirect = (ID_Jump | ID_JumpReg | ID_BranchTaken) & ~Stall;
+
+// Hazard detection unit
+HazardDetection Hazard_Unit(
+    .ID_Instruction(ID_Instruction),
+    .EX_RegWrite(EX_RegWrite),     .EX_DestinationReg(EX_DestinationReg),
+    .MEM_RegWrite(MEM_RegWrite),   .MEM_DestinationReg(MEM_DestinationReg),
+    .WB_RegWrite(WB_RegWrite),     .WB_DestinationReg(WB_DestinationReg),
+    .PCWrite(PCWrite),
+    .IF_IDWrite(IF_IDWrite),
+    .Stall(Stall)
+);
 
     // Write Back (WB) stage
     wire [31:0] WB_WriteData;
