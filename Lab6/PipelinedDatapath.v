@@ -145,7 +145,7 @@ module PipelinedDatapath(
         .Clk(Clk),
         .Reset(Reset),
         .Enable(1'b1),
-        .Flush(Flush),
+        .Flush(Stall),
 
         .RegWriteIn(ID_RegWrite),
         .MemReadIn(ID_MemRead),
