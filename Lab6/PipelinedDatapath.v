@@ -1,10 +1,10 @@
-// ECE369A - Labs 4 and 5
+// ECE369A - Lab 6
 // Pipelined Datapath
 //
 // Team Member Contributions:
-// Zach Scheve  - 33%
-// Madi Mustafa - 33%
-// Trevor Fife  - 34%
+// Zach Scheve  - 45%
+// Madi Mustafa - 10%
+// Trevor Fife  - 45%
 
 `timescale 1ns / 1ps
 
@@ -229,9 +229,9 @@ module PipelinedDatapath(
     // Select Execute stage result for write-back
     wire [31:0] EX_Result;
 
-    // jal stores PC + 8 as the return address
+    // jal stores PC + 4 as the return address
     assign EX_Result = (EX_MemToReg == 2'b10)
-        ? EX_PCPlus4 + 32'd4
+        ? EX_PCPlus4
         : EX_ALUResult;
 
     // EX/MEM Pipeline Register

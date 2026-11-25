@@ -1,10 +1,10 @@
-// ECE369A - Labs 4 and 5
+// ECE369A - Lab 6
 // Pipelined Datapath
 //
 // Team Member Contributions:
-// Zach Scheve  - 33%
-// Madi Mustafa - 33%
-// Trevor Fife  - 34%
+// Zach Scheve  - 45%
+// Madi Mustafa - 10%
+// Trevor Fife  - 45%
 
 `timescale 1ns / 1ps
 
