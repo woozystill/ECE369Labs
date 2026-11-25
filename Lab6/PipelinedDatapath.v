@@ -5,6 +5,7 @@
 // Zach Scheve  - 45%
 // Madi Mustafa - 10%
 // Trevor Fife  - 45%
+// 5 stage pipeline and branch decision and resolution stage: ID
 
 `timescale 1ns / 1ps
 
